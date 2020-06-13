@@ -1,0 +1,32 @@
+# This workflow will build a package using Maven and perform Integration Tests.
+# For more information see: https://github.com/actions/setup-java#apache-maven-with-a-settings-path
+
+name: Maven Package & Integration Tests
+
+on: push
+
+jobs:
+  checkout:
+    - name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Get the project version
+      run: |
+        echo ::set-env name=PROJECT_VERSION::$(echo -n mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+  snapshot-release:
+    if: ${{endsWith('SNAPSHOT', PROJECT_VERSION)}}
+    needs: checkout
+    - name: Setup Java environment
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: $SETTINGS_PATH # location for the settings.xml file
+    - name: Publish snapshot release
+      env:
+        GITHUB_USERNAME: x-access-token
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SETTINGS_PATH: ${{ github.workspace }}/.github/workflows/settings.xml
+      run: mvn -B -s $SETTINGS_PATH deploy
