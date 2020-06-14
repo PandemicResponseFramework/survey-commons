@@ -15,6 +15,8 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
+ * TODO: Add step increment property
+ *
  * @author Marko Voß
  *
  */
