@@ -3,6 +3,8 @@
  */
 package one.tracking.framework.entity.meta.question;
 
+import java.util.Collections;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -39,6 +41,11 @@ public class BooleanQuestion extends Question implements IContainerQuestion {
   @Override
   public boolean hasContainer() {
     return this.container != null;
+  }
+
+  @Override
+  public List<Question> getSubQuestions() {
+    return this.container == null ? Collections.emptyList() : this.container.getQuestions();
   }
 
   @Override
