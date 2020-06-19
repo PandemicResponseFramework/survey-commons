@@ -25,12 +25,14 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
 import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import one.tracking.framework.domain.SurveyResponseData;
 import one.tracking.framework.entity.meta.Answer;
 import one.tracking.framework.entity.meta.question.Question;
 
@@ -69,17 +71,87 @@ import one.tracking.framework.entity.meta.question.Question;
     @NamedNativeQuery(name = "SurveyResponse.nativeFindBySurveyInstanceIdAndUserIdIn",
         resultSetMapping = "StringMapping",
         query = "SELECT DISTINCT sr.user_id FROM survey_response sr "
-            + "WHERE sr.survey_instance_id = ?1 AND sr.user_id IN (?2)")
+            + "WHERE sr.survey_instance_id = ?1 AND sr.user_id IN (?2)"),
+    @NamedNativeQuery(name = "SurveyResponse.nativeFindByCreatedAtBetween",
+        resultSetMapping = "SurveyResponseDataMapping",
+        query = "SELECT " +
+            "  s.name_id," +
+            "  si.start_time," +
+            "  si.end_time," +
+            "  sr.user_id," +
+            "  CASE " +
+            "    WHEN xq.id IS NOT NULL THEN xq.ranking" +
+            "    ELSE q.ranking " +
+            "  END AS ranking," +
+            "  CASE " +
+            "    WHEN xq.id IS NOT NULL THEN xq.question_type" +
+            "    ELSE q.question_type" +
+            "  END AS question_type," +
+            "  CASE " +
+            "    WHEN xq.id IS NOT NULL THEN xq.question" +
+            "    ELSE q.question" +
+            "  END AS question," +
+            "  CASE " +
+            "    WHEN xq.id IS NOT NULL THEN q.question" +
+            "    ELSE NULL" +
+            "  END AS checklist_entry," +
+            "  sr.bool_answer," +
+            "  sr.number_answer," +
+            "  sr.text_answer," +
+            "  a.value as predefined_answer," +
+            "  sr.version," +
+            "  sr.skipped," +
+            "  sr.valid," +
+            "  sr.created_at " +
+            "FROM survey.question q" +
+            "  LEFT JOIN survey.checklist_question_entries cqe ON cqe.entries_id = q.id" +
+            "  LEFT JOIN survey.checklist_question cq ON cq.id = cqe.checklist_question_id" +
+            "  LEFT JOIN survey.question xq ON cq.id = xq.id" +
+            "  , survey.survey_instance si, survey.survey s, survey.survey_response sr" +
+            "  LEFT JOIN survey.survey_response_answers sra ON sr.id = sra.survey_response_id" +
+            "  LEFT JOIN survey.answer a ON sra.answer_id = a.id " +
+            "WHERE q.id = sr.question_id" +
+            "  AND sr.survey_instance_id = si.id" +
+            "  AND si.survey_id = s.id" +
+            "  AND sr.created_at >= ?1" +
+            "  AND sr.created_at <= ?2 " +
+            "ORDER BY s.name_id ASC, si.start_time ASC, si.end_time ASC, sr.user_id ASC, ranking ASC, sr.version ASC")
 })
-@SqlResultSetMapping(
-    name = "StringMapping",
-    classes = {
-        @ConstructorResult(
-            targetClass = String.class,
-            columns = {
-                @ColumnResult(name = "user_id")
-            })
-    })
+@SqlResultSetMappings({
+    @SqlResultSetMapping(
+        name = "StringMapping",
+        classes = {
+            @ConstructorResult(
+                targetClass = String.class,
+                columns = {
+                    @ColumnResult(name = "user_id")
+                })
+        }),
+    @SqlResultSetMapping(
+        name = "SurveyResponseDataMapping",
+        classes = {
+            @ConstructorResult(
+                targetClass = SurveyResponseData.class,
+                columns = {
+                    @ColumnResult(name = "name_id"),
+                    @ColumnResult(name = "start_time"),
+                    @ColumnResult(name = "end_time"),
+                    @ColumnResult(name = "user_id"),
+                    @ColumnResult(name = "ranking"),
+                    @ColumnResult(name = "question_type"),
+                    @ColumnResult(name = "question"),
+                    @ColumnResult(name = "checklist_entry"),
+                    @ColumnResult(name = "bool_answer"),
+                    @ColumnResult(name = "number_answer"),
+                    @ColumnResult(name = "text_answer"),
+                    @ColumnResult(name = "predefined_answer"),
+                    @ColumnResult(name = "version"),
+                    @ColumnResult(name = "skipped"),
+                    @ColumnResult(name = "valid"),
+                    @ColumnResult(name = "created_at"),
+                })
+        })
+})
 public class SurveyResponse {
 
   @Id

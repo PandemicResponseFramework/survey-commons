@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -32,6 +34,11 @@ import one.tracking.framework.entity.User;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "startTime", "endTime"})
     })
+@NamedQueries({@NamedQuery(name = "StepCount.findByCreatedAtBetween",
+    query = "SELECT sc FROM StepCount sc WHERE "
+        + "(sc.updatedAt IS NULL AND sc.createdAt >= ?1 AND sc.createdAt <= ?2) OR "
+        + "(sc.updatedAt IS NOT NULL AND sc.updatedAt >= ?1 AND sc.updatedAt <= ?2) "
+        + "ORDER BY sc.id ASC")})
 public class StepCount {
 
   @Id
