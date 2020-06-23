@@ -25,6 +25,9 @@ public interface SurveyResponseRepository extends CrudRepository<SurveyResponse,
   Optional<SurveyResponse> findTopByUserAndSurveyInstanceAndQuestionOrderByVersionDesc(
       User user, SurveyInstance surveyInstance, Question question);
 
+  Optional<SurveyResponse> findTopByUserAndSurveyInstanceAndQuestionAndValidOrderByVersionDesc(
+      User user, SurveyInstance surveyInstance, Question question, boolean valid);
+
   List<SurveyResponse> findByUserAndSurveyInstanceAndQuestionInOrderByVersionDesc(
       User user, SurveyInstance surveyInstance, Collection<? extends Question> question);
 
