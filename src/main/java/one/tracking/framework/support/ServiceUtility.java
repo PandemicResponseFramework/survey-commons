@@ -9,6 +9,7 @@ import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -31,6 +32,21 @@ import one.tracking.framework.entity.meta.question.Question;
 public final class ServiceUtility {
 
   private static final Random RANDOM = new Random();
+
+  public String generateValidToken(final int length, final int retries, final Predicate<String> existsPredicate)
+      throws IllegalStateException {
+
+    Assert.isTrue(length > 0, "Length must be greater than zero.");
+    Assert.isTrue(retries > 0, "Retries must be greater than zero.");
+    Assert.notNull(existsPredicate, "Predicate must not be null.");
+
+    for (int i = 0; i < retries; i++) {
+      final String token = generateString(length);
+      if (!existsPredicate.test(token))
+        return token;
+    }
+    throw new IllegalStateException("Unable to generate valid token.");
+  }
 
   /**
    *
