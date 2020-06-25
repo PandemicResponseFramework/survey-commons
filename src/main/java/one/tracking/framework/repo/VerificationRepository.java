@@ -6,6 +6,7 @@ package one.tracking.framework.repo;
 import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import one.tracking.framework.entity.Verification;
+import one.tracking.framework.entity.VerificationState;
 
 /**
  * @author Marko Voß
@@ -13,7 +14,7 @@ import one.tracking.framework.entity.Verification;
  */
 public interface VerificationRepository extends CrudRepository<Verification, Long> {
 
-  Optional<Verification> findByHashAndVerified(String hash, boolean verified);
+  Optional<Verification> findByHashAndState(String hash, VerificationState state);
 
   Optional<Verification> findByEmail(String email);
 
