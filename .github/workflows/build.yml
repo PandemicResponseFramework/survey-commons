@@ -22,6 +22,14 @@ jobs:
           echo "::set-env name=PROJECT_VERSION::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
       - name: Current project version
         run: echo "$PROJECT_VERSION"
+      - name: Depedency cache
+        uses: actions/cache@v2
+        if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT')
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - name: Publish snapshot release
         if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT')
         env:
