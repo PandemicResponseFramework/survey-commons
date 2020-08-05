@@ -50,7 +50,7 @@ public class Container {
 
   @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
   @OrderBy("ranking ASC")
-  @JoinColumn(name = "question_id")
+  @JoinColumn(name = "container_id")
   private List<Question> questions;
 
   @ManyToOne(fetch = FetchType.LAZY)
