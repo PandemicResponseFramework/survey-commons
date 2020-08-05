@@ -43,7 +43,9 @@ import lombok.NoArgsConstructor;
     @NamedQuery(name = "Verification.findByEmail",
         query = "SELECT v FROM Verification v WHERE v.email = ?1"),
     @NamedQuery(name = "Verification.findByImportIdOrderByCreatedAtAsc",
-        query = "SELECT v FROM Verification v WHERE v.participantImport.id = ?1 ORDER BY v.createdAt ASC")
+        query = "SELECT v FROM Verification v WHERE v.participantImport.id = ?1 ORDER BY v.createdAt ASC"),
+    @NamedQuery(name = "Verification.findByCreatedAtBeforeOrderByEmailAsc",
+        query = "SELECT v FROM Verification v WHERE v.createdAt <= ?1 ORDER BY v.email ASC"),
 })
 public class Verification {
 
