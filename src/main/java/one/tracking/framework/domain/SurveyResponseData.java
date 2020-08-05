@@ -3,7 +3,6 @@
  */
 package one.tracking.framework.domain;
 
-import java.math.BigInteger;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,15 +21,15 @@ public class SurveyResponseData {
   private Date startTime;
   private Date endTime;
   private String userId;
-  private BigInteger order;
+  private Number order;
   private String questionType;
   private String question;
   private String checkListEntry;
   private Boolean boolAnswer;
-  private Integer numberAnswer;
+  private Number numberAnswer;
   private String textAnswer;
   private String predefinedAnswer;
-  private Integer version;
+  private Number version;
   private Boolean skipped;
   private Boolean valid;
   private Date createdAt;
