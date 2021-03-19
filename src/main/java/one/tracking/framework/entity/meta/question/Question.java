@@ -10,10 +10,12 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 import javax.persistence.Transient;
@@ -25,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import one.tracking.framework.entity.meta.ReleaseStatusType;
 import one.tracking.framework.entity.meta.container.Container;
 
 /**
@@ -65,6 +68,12 @@ public class Question {
   @Column(nullable = false)
   private boolean optional;
 
+  @Column(nullable = false)
+  private ReleaseStatusType releaseStatus;
+
+  @OneToOne(fetch = FetchType.LAZY, optional = true)
+  private Question previousVersion;
+
   /**
    * Convenience method to check if this {@link Question} owns a {@link Container}.
    *
@@ -82,6 +91,14 @@ public class Question {
    */
   public Container getContainer() {
     return null;
+  }
+
+  /**
+   * Convenience method to remove the {@link Container} of this {@link Question}.
+   *
+   */
+  public void clearContainer() {
+
   }
 
   /**
@@ -104,6 +121,7 @@ public class Question {
   void onPrePersist() {
     if (this.id == null) {
       setCreatedAt(Instant.now());
+      setReleaseStatus(ReleaseStatusType.EDIT);
     }
   }
 }

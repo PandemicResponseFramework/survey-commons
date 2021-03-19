@@ -8,7 +8,7 @@
 		<version>2.2.6.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>one.tracking.framework</groupId>
+	<groupId>prf.survey</groupId>
 	<artifactId>survey-commons</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Survey Service Commons</name>
@@ -63,12 +63,12 @@
 		<repository>
 			<id>github</id>
 			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/OneTrackingFramework/survey-commons</url>
+			<url>https://maven.pkg.github.com/PandemicResponseFramework/survey-commons</url>
 		</repository>
 		<snapshotRepository>
 			<id>github</id>
 			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/OneTrackingFramework/survey-commons</url>
+			<url>https://maven.pkg.github.com/PandemicResponseFramework/survey-commons</url>
 		</snapshotRepository>
 	</distributionManagement>
 

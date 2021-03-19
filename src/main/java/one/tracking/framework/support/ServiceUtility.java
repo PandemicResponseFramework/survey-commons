@@ -5,10 +5,11 @@ package one.tracking.framework.support;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.WeekFields;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import one.tracking.framework.domain.SurveyStatusType;
 import one.tracking.framework.entity.SurveyResponse;
 import one.tracking.framework.entity.meta.Answer;
 import one.tracking.framework.entity.meta.Survey;
+import one.tracking.framework.entity.meta.container.Container;
 import one.tracking.framework.entity.meta.question.BooleanQuestion;
 import one.tracking.framework.entity.meta.question.ChecklistEntry;
 import one.tracking.framework.entity.meta.question.ChecklistQuestion;
@@ -71,11 +73,22 @@ public final class ServiceUtility {
     Assert.notNull(survey, "Survey must not be null.");
 
     switch (survey.getIntervalType()) {
-      case WEEKLY:
-        return getCurrentPeriodByWeek(survey);
       case NONE:
-      default:
         return Period.INFINITE;
+      default:
+        return getCurrentPeriod(survey);
+    }
+  }
+
+  public Period getNextSurveyInstancePeriod(final Survey survey, final ZonedDateTime notBefore) {
+
+    Assert.notNull(survey, "Survey must not be null.");
+
+    switch (survey.getIntervalType()) {
+      case NONE:
+        return Period.INFINITE;
+      default:
+        return getNextPeriod(survey, notBefore);
     }
   }
 
@@ -83,25 +96,58 @@ public final class ServiceUtility {
    * @param survey
    * @return
    */
-  private Period getCurrentPeriodByWeek(final Survey survey) {
+  private Period getCurrentPeriod(final Survey survey) {
+
+    final Period nextPeriod = getNextPeriod(survey, ZonedDateTime.now(ZoneOffset.UTC));
+    return new Period(
+        ZonedDateTime.ofInstant(nextPeriod.getStart(), ZoneOffset.UTC)
+            .minus(survey.getIntervalValue(), survey.getIntervalType().toChronoUnit()).toInstant(),
+        ZonedDateTime.ofInstant(nextPeriod.getEnd(), ZoneOffset.UTC)
+            .minus(survey.getIntervalValue(), survey.getIntervalType().toChronoUnit()).toInstant());
+  }
+
+  /**
+   *
+   * @param survey
+   * @param notBefore
+   * @return
+   */
+  private Period getNextPeriod(final Survey survey, final ZonedDateTime notBefore) {
 
     final ZonedDateTime start = survey.getIntervalStart().atZone(ZoneOffset.UTC);
-    final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
-    if (start.isAfter(now))
-      return null;
+    if (start.isAfter(notBefore)) {
+      return new Period(
+          start.toInstant(),
+          start.plus(survey.getIntervalValue(), survey.getIntervalType().toChronoUnit()).minusSeconds(1).toInstant());
+    }
 
-    final int weekStart = start.get(WeekFields.ISO.weekOfWeekBasedYear());
-    final int weekNow = now.get(WeekFields.ISO.weekOfWeekBasedYear());
+    final long intervalLength = survey.getIntervalType().toChronoUnit().getDuration().toSeconds();
+    final long secondsDelta = (notBefore.toEpochSecond() - start.toEpochSecond());
+    final long diff = intervalLength - secondsDelta % intervalLength;
 
-    final int weekDelta = (int) (Math.floor((weekNow - weekStart) / (double) survey.getIntervalValue()));
+    final ZonedDateTime startTime = notBefore.plusSeconds(diff)
+        .withMinute(start.getMinute())
+        .withSecond(start.getSecond())
+        .withNano(start.getNano());
 
-    final ZonedDateTime startTime = start.plusWeeks(weekDelta * survey.getIntervalValue());
     final ZonedDateTime endTime = startTime.plus(survey.getIntervalValue(), survey.getIntervalType().toChronoUnit())
         .minusSeconds(1);
 
     return new Period(startTime.toInstant(), endTime.toInstant());
   }
+
+  // // FIXME DELETE
+  // public static void main(final String[] args) {
+  // final Survey survey = Survey.builder()
+  // .intervalType(IntervalType.WEEKLY)
+  // .intervalStart(Instant.parse("2020-10-18T10:00:00Z"))
+  // .intervalValue(1)
+  // .build();
+  //
+  // final ServiceUtility self = new ServiceUtility();
+  // System.out.println(self.getNextPeriod(survey, ZonedDateTime.now(ZoneOffset.UTC)));
+  // }
 
   public SurveyStatusType calculateSurveyStatus(final Survey survey, final List<SurveyResponse> surveyResponses) {
 
@@ -256,5 +302,25 @@ public final class ServiceUtility {
       default:
         return false;
     }
+  }
+
+  public List<Question> traverseQuestions(final Container container, final Predicate<Question> filter,
+      final Consumer<Question> consumer) {
+
+    final List<Question> consumedQuestions = new ArrayList<>();
+
+    for (final Question question : container.getQuestions()) {
+
+      if (filter.test(question)) {
+        consumer.accept(question);
+        consumedQuestions.add(question);
+      }
+
+      if (question.hasContainer()) {
+        consumedQuestions.addAll(traverseQuestions(question.getContainer(), filter, consumer));
+      }
+    }
+
+    return consumedQuestions;
   }
 }

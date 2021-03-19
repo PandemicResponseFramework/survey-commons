@@ -35,7 +35,7 @@ public class BooleanQuestion extends Question implements IContainerQuestion {
   @Column(nullable = true)
   private Boolean defaultAnswer;
 
-  @OneToOne
+  @OneToOne(orphanRemoval = true)
   private BooleanContainer container;
 
   @Override
@@ -46,6 +46,11 @@ public class BooleanQuestion extends Question implements IContainerQuestion {
   @Override
   public List<Question> getSubQuestions() {
     return this.container == null ? Collections.emptyList() : this.container.getQuestions();
+  }
+
+  @Override
+  public void clearContainer() {
+    this.container = null;
   }
 
   @Override

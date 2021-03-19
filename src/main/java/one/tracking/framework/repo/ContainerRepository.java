@@ -3,11 +3,9 @@
  */
 package one.tracking.framework.repo;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import one.tracking.framework.entity.meta.container.Container;
-import one.tracking.framework.entity.meta.question.Question;
 
 /**
  * @author Marko Voß
@@ -15,5 +13,5 @@ import one.tracking.framework.entity.meta.question.Question;
  */
 public interface ContainerRepository extends CrudRepository<Container, Long> {
 
-  Optional<Container> findByQuestionsIn(Set<Question> questions);
+  List<Container> findByQuestionsId(Long questionId);
 }

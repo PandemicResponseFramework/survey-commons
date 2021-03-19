@@ -9,7 +9,7 @@ package one.tracking.framework.entity.meta;
  */
 public enum ReleaseStatusType {
 
-  NEW,
-  EDITED,
-  RELEASED;
+  EDIT,
+  RELEASED,
+  STOPPED;
 }

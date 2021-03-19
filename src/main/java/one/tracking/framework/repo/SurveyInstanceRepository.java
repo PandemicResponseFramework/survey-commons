@@ -19,4 +19,6 @@ public interface SurveyInstanceRepository extends CrudRepository<SurveyInstance,
 
   Optional<SurveyInstance> findBySurveyAndStartTimeAndEndTime(Survey survey, Instant start, Instant end);
 
+  Optional<SurveyInstance> findTopBySurveyNameIdOrderByStartTimeDesc(String nameId);
+
 }

@@ -29,10 +29,10 @@ import lombok.experimental.SuperBuilder;
 public class TextQuestion extends Question {
 
   @Column(nullable = false)
-  private boolean multiline;
+  private Boolean multiline;
 
   @Column(nullable = false)
-  private int length;
+  private Integer length;
 
   @Override
   @PrePersist

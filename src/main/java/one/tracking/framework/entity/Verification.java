@@ -46,6 +46,8 @@ import lombok.NoArgsConstructor;
         query = "SELECT v FROM Verification v WHERE v.participantImport.id = ?1 ORDER BY v.createdAt ASC"),
     @NamedQuery(name = "Verification.findByCreatedAtBeforeOrderByEmailAsc",
         query = "SELECT v FROM Verification v WHERE v.createdAt <= ?1 ORDER BY v.email ASC"),
+    @NamedQuery(name = "Verification.deleteByEmail",
+        query = "DELETE FROM Verification v WHERE v.email = ?1"),
 })
 public class Verification {
 

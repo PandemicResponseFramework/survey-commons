@@ -44,7 +44,7 @@ public class ChoiceQuestion extends Question implements IContainerQuestion {
   @OneToOne(fetch = FetchType.LAZY)
   private Answer defaultAnswer;
 
-  @OneToOne
+  @OneToOne(orphanRemoval = true)
   private ChoiceContainer container;
 
   @Override
@@ -58,6 +58,11 @@ public class ChoiceQuestion extends Question implements IContainerQuestion {
   }
 
   @Override
+  public void clearContainer() {
+    this.container = null;
+  }
+
+  @Override
   @PrePersist
   void onPrePersist() {
 
@@ -65,7 +70,7 @@ public class ChoiceQuestion extends Question implements IContainerQuestion {
 
     // Only allow a default answer, which is part of the available answers
     if (this.answers != null && this.defaultAnswer != null
-        && this.answers.stream().noneMatch(p -> p.equals(this.defaultAnswer)))
+        && this.answers.stream().noneMatch(p -> p.getValue().equals(this.defaultAnswer.getValue())))
       this.defaultAnswer = null;
   }
 }

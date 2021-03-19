@@ -27,4 +27,6 @@ import lombok.experimental.SuperBuilder;
 public class ChecklistEntry extends Question {
 
   private Boolean defaultAnswer;
+
+
 }
