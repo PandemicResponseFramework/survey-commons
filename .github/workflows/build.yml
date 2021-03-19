@@ -25,9 +25,9 @@ jobs:
           settings-path: $SETTINGS_PATH # location for the settings.xml file
       - name: Get the project version
         run: |
-          echo "::set-env name=PROJECT_VERSION::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+          echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
       - name: Current project version
-        run: echo "$PROJECT_VERSION"
+        run: echo "${{ env.PROJECT_VERSION }}"
       - name: Depedency cache
         uses: actions/cache@v2
         if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT')
