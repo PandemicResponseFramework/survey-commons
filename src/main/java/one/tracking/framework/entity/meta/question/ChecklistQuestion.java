@@ -32,4 +32,9 @@ public class ChecklistQuestion extends Question {
   @NotEmpty
   @OneToMany
   private List<ChecklistEntry> entries;
+
+  @Override
+  public QuestionType getType() {
+    return QuestionType.CHECKLIST;
+  }
 }

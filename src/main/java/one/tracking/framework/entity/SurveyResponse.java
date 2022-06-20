@@ -19,15 +19,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import org.hibernate.annotations.NamedNativeQueries;
+import org.hibernate.annotations.NamedNativeQuery;
+import org.hibernate.annotations.NamedQueries;
+import org.hibernate.annotations.NamedQuery;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -65,13 +65,12 @@ import one.tracking.framework.entity.meta.question.Question;
         + "    WHERE x.user = s.user "
         + "      AND x.surveyInstance = s.surveyInstance "
         + "      AND x.question = s.question"
-        + "  )")
+        + "  )"),
+    @NamedQuery(name = "SurveyResponse.findBySurveyInstanceIdAndUserIdIn",
+        query = "SELECT DISTINCT sr.user.id FROM SurveyResponse sr "
+            + "WHERE sr.surveyInstance.id = ?1 AND sr.user.id IN (?2)")
 })
 @NamedNativeQueries({
-    @NamedNativeQuery(name = "SurveyResponse.nativeFindBySurveyInstanceIdAndUserIdIn",
-        resultSetMapping = "StringMapping",
-        query = "SELECT DISTINCT sr.user_id FROM survey_response sr "
-            + "WHERE sr.survey_instance_id = ?1 AND sr.user_id IN (?2)"),
     @NamedNativeQuery(name = "SurveyResponse.nativeFindByCreatedAtBetween",
         resultSetMapping = "SurveyResponseDataMapping",
         query = "SELECT " +

@@ -17,17 +17,11 @@ import javax.persistence.InheritanceType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderBy;
-import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
-import javax.persistence.Transient;
-import org.hibernate.annotations.Formula;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import one.tracking.framework.entity.meta.ReleaseStatusType;
 import one.tracking.framework.entity.meta.question.Question;
@@ -56,22 +50,8 @@ public class Container {
   @ManyToOne(fetch = FetchType.EAGER)
   private Question parent;
 
-  @Getter(AccessLevel.NONE)
-  @Setter(AccessLevel.NONE)
-  @Formula("CONTAINER_TYPE")
-  private String typeString;
-
-  @Transient
-  @Setter(AccessLevel.NONE)
-  private ContainerType type;
-
   @Column(nullable = false, updatable = false)
   private Instant createdAt;
-
-  @PostLoad
-  void onPostLoad() {
-    this.type = ContainerType.valueOf(this.typeString);
-  }
 
   @PrePersist
   protected void onPrePersist() {

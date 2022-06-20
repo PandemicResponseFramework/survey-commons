@@ -28,5 +28,8 @@ public class ChecklistEntry extends Question {
 
   private Boolean defaultAnswer;
 
-
+  @Override
+  public QuestionType getType() {
+    return QuestionType.CHECKLIST_ENTRY;
+  }
 }

@@ -58,4 +58,9 @@ public class BooleanQuestion extends Question implements IContainerQuestion {
   void onPrePersist() {
     super.onPrePersist();
   }
+
+  @Override
+  public QuestionType getType() {
+    return QuestionType.BOOL;
+  }
 }

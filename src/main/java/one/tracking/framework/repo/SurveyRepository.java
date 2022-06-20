@@ -44,15 +44,25 @@ public interface SurveyRepository extends CrudRepository<Survey, Long> {
       IntervalType intervalType);
 
   @Query(value = "SELECT s FROM Survey s " +
-      " WHERE s.releaseStatus = 'EDIT' OR s.releaseStatus = 'EDIT'" +
-      " OR s.version = ( " +
-      "   SELECT MAX(x.version) " +
-      "   FROM Survey x " +
-      "   WHERE x.nameId = s.nameId AND x.releaseStatus = 'RELEASED'" +
-      "   )" +
-      " ORDER BY s.nameId ASC, s.version ASC")
+      "WHERE s.releaseStatus = 'EDIT'" +
+      "OR s.version = ( " +
+      "  SELECT MAX(x.version) " +
+      "  FROM Survey x " +
+      "  WHERE x.nameId = s.nameId AND x.releaseStatus = 'RELEASED'" +
+      "  AND (x.intervalStart < NOW() OR x.intervalStart IS NULL)" +
+      "  )" +
+      "OR s.version = ( " +
+      "  SELECT MAX(x.version) " +
+      "  FROM Survey x " +
+      "  WHERE x.nameId = s.nameId AND x.releaseStatus = 'RELEASED'" +
+      "  AND x.intervalStart >= NOW()" +
+      "  )" +
+      "ORDER BY s.nameId ASC, s.version ASC")
   List<Survey> findCurrentVersions();
 
   @Query(value = "SELECT DISTINCT s.nameId FROM Survey s ORDER BY s.nameId ASC")
   List<String> findAllNameIds();
+
+  @Query(value = "SELECT DISTINCT s.nameId FROM Survey s ORDER BY s.nameId ASC")
+  List<String> findDependsOnOfNameId(); // FIXME
 }

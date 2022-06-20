@@ -5,7 +5,6 @@ package one.tracking.framework.support;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import one.tracking.framework.domain.Period;
 import one.tracking.framework.domain.SurveyStatusType;
+import one.tracking.framework.domain.TraversalResult;
 import one.tracking.framework.entity.SurveyResponse;
 import one.tracking.framework.entity.meta.Answer;
 import one.tracking.framework.entity.meta.Survey;
@@ -136,18 +136,6 @@ public final class ServiceUtility {
 
     return new Period(startTime.toInstant(), endTime.toInstant());
   }
-
-  // // FIXME DELETE
-  // public static void main(final String[] args) {
-  // final Survey survey = Survey.builder()
-  // .intervalType(IntervalType.WEEKLY)
-  // .intervalStart(Instant.parse("2020-10-18T10:00:00Z"))
-  // .intervalValue(1)
-  // .build();
-  //
-  // final ServiceUtility self = new ServiceUtility();
-  // System.out.println(self.getNextPeriod(survey, ZonedDateTime.now(ZoneOffset.UTC)));
-  // }
 
   public SurveyStatusType calculateSurveyStatus(final Survey survey, final List<SurveyResponse> surveyResponses) {
 
@@ -304,23 +292,34 @@ public final class ServiceUtility {
     }
   }
 
-  public List<Question> traverseQuestions(final Container container, final Predicate<Question> filter,
-      final Consumer<Question> consumer) {
+  public TraversalResult traverseContainer(final Container container,
+      final Predicate<Question> questionFilter,
+      final Consumer<Question> questionConsumer,
+      final Predicate<Container> containerFilter,
+      final Consumer<Container> containerConsumer) {
 
-    final List<Question> consumedQuestions = new ArrayList<>();
+    final TraversalResult result = new TraversalResult();
+
+    if (containerFilter.test(container)) {
+      containerConsumer.accept(container);
+      result.add(container);
+    }
 
     for (final Question question : container.getQuestions()) {
 
-      if (filter.test(question)) {
-        consumer.accept(question);
-        consumedQuestions.add(question);
+      if (questionFilter.test(question)) {
+
+        questionConsumer.accept(question);
+        result.add(question);
       }
 
       if (question.hasContainer()) {
-        consumedQuestions.addAll(traverseQuestions(question.getContainer(), filter, consumer));
+
+        result.merge(traverseContainer(question.getContainer(), questionFilter, questionConsumer, containerFilter,
+            containerConsumer));
       }
     }
 
-    return consumedQuestions;
+    return result;
   }
 }

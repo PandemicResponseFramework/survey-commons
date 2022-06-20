@@ -36,4 +36,8 @@ public class NumberQuestion extends Question {
   @Column(nullable = true)
   private Integer defaultAnswer;
 
+  @Override
+  public QuestionType getType() {
+    return QuestionType.NUMBER;
+  }
 }

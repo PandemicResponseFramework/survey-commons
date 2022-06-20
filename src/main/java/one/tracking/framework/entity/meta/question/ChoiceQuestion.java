@@ -63,6 +63,11 @@ public class ChoiceQuestion extends Question implements IContainerQuestion {
   }
 
   @Override
+  public QuestionType getType() {
+    return QuestionType.CHOICE;
+  }
+
+  @Override
   @PrePersist
   void onPrePersist() {
 

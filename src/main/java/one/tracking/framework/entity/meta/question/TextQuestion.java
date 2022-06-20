@@ -35,6 +35,11 @@ public class TextQuestion extends Question {
   private Integer length;
 
   @Override
+  public QuestionType getType() {
+    return QuestionType.TEXT;
+  }
+
+  @Override
   @PrePersist
   void onPrePersist() {
     super.onPrePersist();

@@ -46,6 +46,11 @@ public class RangeQuestion extends Question {
   private Integer defaultAnswer;
 
   @Override
+  public QuestionType getType() {
+    return QuestionType.RANGE;
+  }
+
+  @Override
   @PrePersist
   void onPrePersist() {
 
