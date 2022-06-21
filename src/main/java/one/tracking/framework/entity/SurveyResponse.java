@@ -68,53 +68,74 @@ import one.tracking.framework.entity.meta.question.Question;
         + "  )"),
     @NamedQuery(name = "SurveyResponse.findBySurveyInstanceIdAndUserIdIn",
         query = "SELECT DISTINCT sr.user.id FROM SurveyResponse sr "
-            + "WHERE sr.surveyInstance.id = ?1 AND sr.user.id IN (?2)")
+            + "WHERE sr.surveyInstance.id = ?1 AND sr.user.id IN (?2)"),
+    // TODO: Replace NamedNativeQuery with NamedQuery
+    // @NamedQuery(name = "SurveyResponse.findByCreatedAtBetween",
+    // query = "SELECT new one.tracking.framework.domain.SurveyResponseData("
+    // + "s.nameId,"
+    // + "si.startTime,"
+    // + "si.endTime,"
+    // + "sr.userId,"
+    // + "CASE WHEN xq.id IS NOT NULL THEN xq.ranking ELSE q.ranking,"
+    // + "CASE WHEN xq.id IS NOT NULL THEN xq.questionType ELSE q.questionType,"
+    // + "CASE WHEN xq.id IS NOT NULL THEN xq.question ELSE q.question,"
+    // + "CASE WHEN xq.id IS NOT NULL THEN q.question ELSE NULL,"
+    // + "sr.boolAnswer,"
+    // + "sr.numberAnswer,"
+    // + "sr.textAnswer,"
+    // + "a.value,"
+    // + "sr.version,"
+    // + "sr.skipped,"
+    // + "sr.valid,"
+    // + "sr.createdAt)"
+    // + "FROM Question q"
+    // + " LEFT JOIN ChecklistQuestion cq ON cq.id = q.id"),
 })
 @NamedNativeQueries({
     @NamedNativeQuery(name = "SurveyResponse.nativeFindByCreatedAtBetween",
         resultSetMapping = "SurveyResponseDataMapping",
         query = "SELECT " +
-            "  s.name_id," +
-            "  si.start_time," +
-            "  si.end_time," +
-            "  sr.user_id," +
+            "  s.\"name_id\"," +
+            "  si.\"start_time\"," +
+            "  si.\"end_time\"," +
+            "  sr.\"user_id\"," +
             "  CASE " +
-            "    WHEN xq.id IS NOT NULL THEN xq.ranking" +
-            "    ELSE q.ranking " +
+            "    WHEN xq.\"id\" IS NOT NULL THEN xq.\"ranking\"" +
+            "    ELSE q.\"ranking\" " +
             "  END AS ranking," +
             "  CASE " +
-            "    WHEN xq.id IS NOT NULL THEN xq.question_type" +
-            "    ELSE q.question_type" +
+            "    WHEN xq.\"id\" IS NOT NULL THEN xq.\"question_type\"" +
+            "    ELSE q.\"question_type\"" +
             "  END AS question_type," +
             "  CASE " +
-            "    WHEN xq.id IS NOT NULL THEN xq.question" +
-            "    ELSE q.question" +
+            "    WHEN xq.\"id\" IS NOT NULL THEN xq.\"question\"" +
+            "    ELSE q.\"question\"" +
             "  END AS question," +
             "  CASE " +
-            "    WHEN xq.id IS NOT NULL THEN q.question" +
+            "    WHEN xq.\"id\" IS NOT NULL THEN q.\"question\"" +
             "    ELSE NULL" +
             "  END AS checklist_entry," +
-            "  sr.bool_answer," +
-            "  sr.number_answer," +
-            "  sr.text_answer," +
-            "  a.value as predefined_answer," +
-            "  sr.version," +
-            "  sr.skipped," +
-            "  sr.valid," +
-            "  sr.created_at " +
-            "FROM survey.question q" +
-            "  LEFT JOIN survey.checklist_question_entries cqe ON cqe.entries_id = q.id" +
-            "  LEFT JOIN survey.checklist_question cq ON cq.id = cqe.checklist_question_id" +
-            "  LEFT JOIN survey.question xq ON cq.id = xq.id" +
-            "  , survey.survey_instance si, survey.survey s, survey.survey_response sr" +
-            "  LEFT JOIN survey.survey_response_answers sra ON sr.id = sra.survey_response_id" +
-            "  LEFT JOIN survey.answer a ON sra.answer_id = a.id " +
-            "WHERE q.id = sr.question_id" +
-            "  AND sr.survey_instance_id = si.id" +
-            "  AND si.survey_id = s.id" +
-            "  AND sr.created_at >= ?1" +
-            "  AND sr.created_at <= ?2 " +
-            "ORDER BY s.name_id ASC, si.start_time ASC, si.end_time ASC, sr.user_id ASC, ranking ASC, sr.version ASC")
+            "  sr.\"bool_answer\"," +
+            "  sr.\"number_answer\"," +
+            "  sr.\"text_answer\"," +
+            "  a.\"value\" as predefined_answer," +
+            "  sr.\"version\"," +
+            "  sr.\"skipped\"," +
+            "  sr.\"valid\"," +
+            "  sr.\"created_at\" " +
+            "FROM survey.\"question\" q" +
+            "  LEFT JOIN survey.\"checklist_question_entries\" cqe ON cqe.\"entries_id\" = q.\"id\"" +
+            "  LEFT JOIN survey.\"checklist_question\" cq ON cq.\"id\" = cqe.\"checklist_question_id\"" +
+            "  LEFT JOIN survey.\"question\" xq ON cq.\"id\" = xq.\"id\"" +
+            "  , survey.\"survey_instance\" si, survey.\"survey\" s, survey.\"survey_response\" sr" +
+            "  LEFT JOIN survey.\"survey_response_answers\" sra ON sr.\"id\" = sra.\"survey_response_id\"" +
+            "  LEFT JOIN survey.\"answer\" a ON sra.\"answer_id\" = a.\"id\" " +
+            "WHERE q.\"id\" = sr.\"question_id\"" +
+            "  AND sr.\"survey_instance_id\" = si.\"id\"" +
+            "  AND si.\"survey_id\" = s.\"id\"" +
+            "  AND sr.\"created_at\" >= ?1" +
+            "  AND sr.\"created_at\" <= ?2 " +
+            "ORDER BY s.\"name_id\" ASC, si.\"start_time\" ASC, si.\"end_time\" ASC, sr.\"user_id\" ASC, ranking ASC, sr.\"version\" ASC")
 })
 @SqlResultSetMappings({
     @SqlResultSetMapping(
