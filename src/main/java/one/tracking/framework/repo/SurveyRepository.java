@@ -26,6 +26,8 @@ public interface SurveyRepository extends CrudRepository<Survey, Long> {
 
   Optional<Survey> findTopByNameIdAndReleaseStatusOrderByVersionDesc(String nameId, ReleaseStatusType status);
 
+  boolean existsTopByNameIdAndReleaseStatusOrderByVersionDesc(String nameId, ReleaseStatusType status);
+
   List<Survey> findByReleaseStatusOrderByNameIdAscVersionDesc(ReleaseStatusType status);
 
   List<Survey> findByNameIdOrderByVersionDesc(String nameId);
@@ -65,4 +67,7 @@ public interface SurveyRepository extends CrudRepository<Survey, Long> {
 
   @Query(value = "SELECT DISTINCT s.nameId FROM Survey s WHERE s.dependsOn = ?1 ORDER BY s.nameId ASC")
   List<String> findAllNameIdsByDependsOn(String nameId);
+
+  @Query(value = "SELECT CASE WHEN COUNT(s) > 0 THEN TRUE ELSE FALSE END FROM Survey s WHERE s.dependsOn = ?1")
+  boolean existsAnyNameIdByDependsOn(String nameId);
 }
